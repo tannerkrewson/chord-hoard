@@ -24,8 +24,10 @@ function getAllKeys(progression) {
 
         let minors = getProgressionMinorsArray(romans);
 
+        let tails = getProgressionTailsArray(romans);
+
         //example: C-G-Am-F
-        res += offsetArrayToNotes(i, offsets, minors);
+        res += offsetArrayToNotes(i, offsets, minors, tails);
 
         res += '\n';
     }
@@ -35,22 +37,23 @@ function getAllKeys(progression) {
 
 function getNumberOfRoman (roman) {
     roman = roman.toLowerCase();
-    switch (roman) {
-        case 'i':
-            return 0;
-        case 'ii':
-            return 2;
-        case 'iii':
-            return 4;
-        case 'iv':
-            return 5;
-        case 'v':
-            return 7;
-        case 'vi':
-            return 9;
-        case 'vii':
-            return 11;
+
+    if (roman.startsWith('iii')) {
+        return 4;
+    } else if (roman.startsWith('ii')) {
+        return 2;
+    } else if (roman.startsWith('iv')) {
+        return 5;
+    } else if (roman.startsWith('i')) {
+        return 0;
+    } else if (roman.startsWith('vii')) {
+        return 11;
+    } else if (roman.startsWith('vi')) {
+        return 9;
+    } else if (roman.startsWith('v')) {
+        return 7;
     }
+
     alert('bad roman numeral: ' + roman);
     return -1;
 }
@@ -73,17 +76,33 @@ function getProgressionMinorsArray (romans) {
     return res;
 }
 
-function isMinor(roman) {
-    return (roman === roman.toLowerCase()) ? 'm' : '';
+function getProgressionTailsArray (romans) {
+    let res = [];
+    for (let note of romans) {
+        let thisTail = '';
+        if (note.endsWith('maj7')) {
+            thisTail += 'maj7';
+        } else if (note.endsWith('7')) {
+            thisTail += '7';
+        }
+        res.push(thisTail);
+    }
+    return res;
 }
 
-function offsetArrayToNotes (initial, offsetArray, minorArray) {
+function isMinor(roman) {
+    let first = roman.charAt(0);
+    return (first === first.toLowerCase()) ? 'm' : '';
+}
+
+function offsetArrayToNotes (initial, offsetArray, minorArray, tailsArray) {
     let res = '';
     for (let i in offsetArray) {
         let offset = offsetArray[i];
 
         res += getOffsetNote(initial, offset);
         res += minorArray[i];
+        res += tailsArray[i];
         res += '-';
     }
 
